@@ -1,0 +1,121 @@
+product_id,product_name,product_price,available,supplier_id
+1,Filete de Tilapia 500g,30319.3,True,38
+2,Mantequilla Alpina 250g,58827.81,False,25
+3,Yuca 1kg,57341.62,False,3
+4,Tomate de Árbol 500g,15978.83,False,36
+5,Jet Chocolate,30762.35,False,15
+6,Pepsi Black 1.5L,98573.01,True,28
+7,M&M’s Maní 45g,82533.95,False,23
+8,Plátano Verde 1kg,61633.68,True,7
+9,Pan Tajado Artesano,16727.13,True,40
+10,Café Águila Roja 250g,42516.86,False,32
+11,Esponja Scotch-Brite x2,84295.67,True,12
+12,Pan Integral Bimbo 600g,71698.08,False,19
+13,Cerveza BBC 330ml,71569.74,True,24
+14,Club Colombia Dorada 330ml,46998.48,True,10
+15,Ron Medellín 375ml,81943.98,False,16
+16,Tocineta Pietrán 200g,73418.86,False,30
+17,Aguila Light 330ml,58712.5,False,3
+18,Roscas Ramo,35346.09,True,23
+19,Red Bull 250ml,90987.5,False,15
+20,Bocadillo Veleño 50g,63074.38,True,37
+21,Croissant de Mantequilla,35036.04,True,11
+22,Agua Brisa 600ml,29811.3,False,18
+23,Ajo 250g,25868.44,True,12
+24,Trapero Microfibra,66164.28,True,16
+25,Barra Tosh Granola 25g,4261.02,False,14
+26,Atún Isabel Aceite 170g,92474.93,True,6
+27,Papas Margarita Natural 250g,52163.11,True,37
+28,Whisky Old Parr 750ml,2683.15,False,17
+29,Colombiana Postobón 1.5L,37253.16,False,24
+30,Galletas Tosh Avena 200g,22196.8,True,3
+31,Coca-Cola 1.5L,97665.94,False,12
+32,Jamón Zenú Tradicional 250g,35120.41,False,25
+33,Jugo Natural One Naranja 1L,64829.84,False,12
+34,Queso Cheddar Tajado 200g,44198.55,False,33
+35,Helado Crem Helado Vainilla 1L,29966.55,True,32
+36,Leche Descremada Alquería 1L,84319.46,False,7
+37,Avena en Hojuelas 500g,44599.8,False,12
+38,Submarino Fresa,98339.92,True,11
+39,Empanadas de Pollo Congeladas x6,19633.78,False,9
+40,Desinfectante Lysol 500ml,82548.56,False,6
+41,Jabón Protex Barra,45377.64,False,33
+42,Club Colombia Dorada 330ml,17823.08,True,1
+43,Bianchi Max,77047.37,False,25
+44,Leche Entera Alpina 1L,74043.53,True,21
+45,Shampoo Pantene 400ml,73663.99,True,27
+46,Calabacín 1kg,2916.98,False,23
+47,Pan Francés x10 und,25294.91,False,36
+48,Queso Parmesano Rallado 100g,7006.12,True,7
+49,Apio 500g,25664.97,False,23
+50,Chocoso,23603.41,False,2
+51,Mostaza Fruco 250g,52293.34,True,14
+52,Gaseosa Bretaña 1.5L,32245.58,False,34
+53,Kumis Alpina 1L,49862.88,False,13
+54,Leche Entera Alpina 1L,66988.33,False,17
+55,Azúcar Manuelita 1kg,89425.26,True,7
+56,Tomate de Árbol 500g,10464.05,False,15
+57,Pechuga de Pollo 1kg,73605.51,False,12
+58,Salchichón Cervecero Colanta 500g,45703.93,True,25
+59,Limón Tahití 500g,5455.6,True,37
+60,Leche Alquería Entera 1L,41213.69,False,18
+61,Mostaza Fruco 250g,24861.47,False,15
+62,Coca-Cola 1.5L,27945.13,True,19
+63,Papa Criolla 1kg,56462.73,True,18
+64,Limón Tahití 500g,1388.5,False,32
+65,Jabón Protex Barra,67887.99,False,35
+66,Mayonesa Fruco 250g,82863.05,True,36
+67,Mantequilla Colanta 250g,44294.56,False,6
+68,Guayaba 1kg,24058.93,True,18
+69,Café Águila Roja 250g,36233.3,False,23
+70,Rosquitas Margarita 150g,10075.99,False,4
+71,Yuca 1kg,52831.55,False,39
+72,Lechuga Batavia 1 und,89086.27,False,6
+73,Aguila Original 330ml,36974.27,True,12
+74,Carne Molida de Res 500g,92153.11,True,12
+75,Salchicha Viena Zenú 250g,10479.12,True,3
+76,Heineken 330ml,90903.49,False,19
+77,Pechuga de Pollo 1kg,81565.68,True,9
+78,Galletas Ducales 300g,60053.91,True,40
+79,Ambientador Glade 250ml,38321.43,True,32
+80,Chuleta de Cerdo 1kg,74200.73,False,35
+81,Powerade Azul 500ml,83074.51,False,32
+82,Coca-Cola 1.5L,62109.31,True,36
+83,Brócoli 500g,81392.53,False,4
+84,Guayaba 1kg,28554.24,True,7
+85,Yuca 1kg,99438.3,True,23
+86,Club Colombia Dorada 330ml,64032.93,False,21
+87,Pimentón Rojo 500g,64743.45,True,12
+88,Salsa de Tomate Fruco 400g,19877.41,False,31
+89,Croissant de Mantequilla,8852.71,True,16
+90,Pechuga de Pollo 1kg,98348.57,True,10
+91,Colombiana Postobón 1.5L,10286.1,True,4
+92,Queso Holandés 250g,58195.31,False,25
+93,Choclitos Natural 200g,17661.7,False,29
+94,Cepillo para Ropa,65648.36,True,26
+95,Banano 1kg,37823.06,False,3
+96,Bianchi Chocolate,23238.73,True,22
+97,Leche Deslactosada Alquería 1L,26579.26,False,20
+98,Aguardiente Antioqueño 375ml,71503.62,True,23
+99,Chuleta de Cerdo 1kg,36295.57,True,5
+100,Albóndigas de Res 500g,71569.99,True,9
+101,Coco 1 und,81556.79,False,13
+102,Galletas Festival Vainilla 300g,82119.58,False,5
+103,Agua Evian 500ml,20664.41,True,40
+104,Repollo 1kg,71409.8,False,37
+105,Vino Gato Negro Tinto 750ml,91180.55,False,18
+106,Agua Evian 500ml,37787.58,False,19
+107,Pan Bimbo Blanco Grande,79520.67,False,2
+108,Pan Integral Rústico,81290.08,True,40
+109,Costilla de Cerdo 1kg,55369.14,True,27
+110,Jamón de Pavo Pietrán 250g,75569.05,True,14
+111,Costilla de Cerdo 1kg,40533.69,True,36
+112,Coca-Cola 1.5L,60988.35,False,14
+113,Ponqué Gala Ramo,63697.91,True,13
+114,Pan Dulce Relleno,91328.49,False,13
+115,Jabón Dove Barra,77463.18,False,22
+116,Huevos AA x30 und,91748.84,False,31
+117,Atún Van Camp's en Agua 170g,20463.46,True,18
+118,Leche Alquería Entera 1L,83592.98,True,36
+119,Miel de Abeja 250g,99054.92,True,17
+120,Guayaba 1kg,79124.41,False,1

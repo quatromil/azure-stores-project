@@ -1,0 +1,494 @@
+{
+    "name": "pl_ingest_blob_to_landing",
+    "properties": {
+        "activities": [
+            {
+                "name": "Get_Ingest_Folders",
+                "type": "GetMetadata",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "dataset_origen_blob",
+                        "type": "DatasetReference"
+                    },
+                    "fieldList": [
+                        "childItems"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobStorageReadSettings",
+                        "recursive": true,
+                        "enablePartitionDiscovery": false
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "Filter_Ingest_Folders",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get_Ingest_Folders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get_Ingest_Folders').output.childItems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@startswith(item().name, 'store-')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "ForEach Store",
+                "type": "ForEach",
+                "dependsOn": [
+                    {
+                        "activity": "Filter_Ingest_Folders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Filter_Ingest_Folders').output.Value",
+                        "type": "Expression"
+                    },
+                    "isSequential": false,
+                    "activities": [
+                        {
+                            "name": "currentStoreName",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "policy": {
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "currentStore",
+                                "value": {
+                                    "value": "@item().name",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Get_Ingest_Store_Files",
+                            "type": "GetMetadata",
+                            "dependsOn": [
+                                {
+                                    "activity": "currentStoreName",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "dataset": {
+                                    "referenceName": "dataset_blob_path_moveTo_landing",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "folderName": {
+                                            "value": "@variables('currentStore')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                },
+                                "fieldList": [
+                                    "childItems"
+                                ],
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageReadSettings",
+                                    "recursive": true,
+                                    "enablePartitionDiscovery": false
+                                },
+                                "formatSettings": {
+                                    "type": "DelimitedTextReadSettings"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Execute pl_get_blob_files",
+                            "type": "ExecutePipeline",
+                            "dependsOn": [
+                                {
+                                    "activity": "Filter_Today_Customers",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "pipeline": {
+                                    "referenceName": "pl_get_blob_files",
+                                    "type": "PipelineReference"
+                                },
+                                "waitOnCompletion": true,
+                                "parameters": {
+                                    "storesFiles": {
+                                        "value": "@activity('Filter_Today_Customers').output.value",
+                                        "type": "Expression"
+                                    },
+                                    "storeName": {
+                                        "value": "@variables('currentStore')",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "name": "Filter_Today_Customers",
+                            "type": "Filter",
+                            "dependsOn": [
+                                {
+                                    "activity": "Get_Ingest_Store_Files",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "items": {
+                                    "value": "@activity('Get_Ingest_Store_Files').output.childItems",
+                                    "type": "Expression"
+                                },
+                                "condition": {
+                                    "value": "@equals(item().name, concat('customers_', formatDateTime(convertTimeZone(utcNow(), 'UTC', 'SA Pacific Standard Time'), 'yyyyMMdd'), '.csv'))\n",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Filter_Today_Sales",
+                            "type": "Filter",
+                            "dependsOn": [
+                                {
+                                    "activity": "Get_Ingest_Store_Files",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "items": {
+                                    "value": "@activity('Get_Ingest_Store_Files').output.childItems",
+                                    "type": "Expression"
+                                },
+                                "condition": {
+                                    "value": "@equals(item().name, concat('sales_', formatDateTime(convertTimeZone(utcNow(), 'UTC', 'SA Pacific Standard Time'), 'yyyyMMdd'), '.csv'))\n",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Copy_sales_blob_adsl",
+                            "type": "ExecutePipeline",
+                            "dependsOn": [
+                                {
+                                    "activity": "Filter_Today_Sales",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "pipeline": {
+                                    "referenceName": "pl_get_blob_files",
+                                    "type": "PipelineReference"
+                                },
+                                "waitOnCompletion": true,
+                                "parameters": {
+                                    "storesFiles": {
+                                        "value": "@activity('Filter_Today_Sales').output.value",
+                                        "type": "Expression"
+                                    },
+                                    "storeName": {
+                                        "value": "@variables('currentStore')",
+                                        "type": "Expression"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Filter_Ingest_Folder_Products",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get_Ingest_Folders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get_Ingest_Folders').output.childItems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().name, 'products')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Get_Ingest_Products",
+                "type": "GetMetadata",
+                "dependsOn": [
+                    {
+                        "activity": "Filter_Ingest_Folder_Products",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "dataset_blob_path_moveTo_landing",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folderName": "products"
+                        }
+                    },
+                    "fieldList": [
+                        "childItems"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobStorageReadSettings",
+                        "recursive": true,
+                        "enablePartitionDiscovery": false
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "Filter_Today_Products",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get_Ingest_Products",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get_Ingest_Products').output.childItems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().name, concat('products_', formatDateTime(convertTimeZone(utcNow(), 'UTC', 'SA Pacific Standard Time'), 'yyyyMMdd'), '.csv'))",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Copy_products_blob_adsl",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Filter_Today_Products",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "pl_get_blob_files",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "storesFiles": {
+                            "value": "@activity('Filter_Today_Products').output.value",
+                            "type": "Expression"
+                        },
+                        "storeName": "products"
+                    }
+                }
+            },
+            {
+                "name": "Filter_Ingest_Folder_Suppliers",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get_Ingest_Folders",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get_Ingest_Folders').output.childItems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().name, 'suppliers')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Get Ingest_Suppliers",
+                "type": "GetMetadata",
+                "dependsOn": [
+                    {
+                        "activity": "Filter_Ingest_Folder_Suppliers",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "dataset": {
+                        "referenceName": "dataset_blob_path_moveTo_landing",
+                        "type": "DatasetReference",
+                        "parameters": {
+                            "folderName": "suppliers"
+                        }
+                    },
+                    "fieldList": [
+                        "childItems"
+                    ],
+                    "storeSettings": {
+                        "type": "AzureBlobStorageReadSettings",
+                        "recursive": true,
+                        "enablePartitionDiscovery": false
+                    },
+                    "formatSettings": {
+                        "type": "DelimitedTextReadSettings"
+                    }
+                }
+            },
+            {
+                "name": "Filter_Today_Suppliers",
+                "type": "Filter",
+                "dependsOn": [
+                    {
+                        "activity": "Get Ingest_Suppliers",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@activity('Get Ingest_Suppliers').output.childItems",
+                        "type": "Expression"
+                    },
+                    "condition": {
+                        "value": "@equals(item().name, concat('suppliers_', formatDateTime(convertTimeZone(utcNow(), 'UTC', 'SA Pacific Standard Time'), 'yyyyMMdd'), '.csv'))\n",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Copy_suppliers_blob_adsl",
+                "type": "ExecutePipeline",
+                "dependsOn": [
+                    {
+                        "activity": "Filter_Today_Suppliers",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "pl_get_blob_files",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true,
+                    "parameters": {
+                        "storesFiles": {
+                            "value": "@activity('Filter_Today_Suppliers').output.value",
+                            "type": "Expression"
+                        },
+                        "storeName": "suppliers"
+                    }
+                }
+            }
+        ],
+        "variables": {
+            "currentStore": {
+                "type": "String"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2025-09-29T18:45:09Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

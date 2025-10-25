@@ -1,0 +1,173 @@
+{
+    "name": "pl_main",
+    "properties": {
+        "activities": [
+            {
+                "name": "Execute pl_ingest_blob_to_landing",
+                "type": "ExecutePipeline",
+                "dependsOn": [],
+                "policy": {
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "pipeline": {
+                        "referenceName": "pl_ingest_blob_to_landing",
+                        "type": "PipelineReference"
+                    },
+                    "waitOnCompletion": true
+                }
+            },
+            {
+                "name": "run_synapse_notebook",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "Execute pl_ingest_blob_to_landing",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": {
+                            "value": "01_move_landing_to_processed",
+                            "type": "Expression"
+                        },
+                        "type": "NotebookReference"
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": {
+                            "value": "sparkpoolnew",
+                            "type": "Expression"
+                        },
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": true,
+                        "spark.dynamicAllocation.minExecutors": 1,
+                        "spark.dynamicAllocation.maxExecutors": 2
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": 1
+                },
+                "linkedServiceName": {
+                    "referenceName": "ls_adf_synap_notebook",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "run_synapse_notebook_silver",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "run_synapse_notebook",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": {
+                            "value": "02_transform_silver",
+                            "type": "Expression"
+                        },
+                        "type": "NotebookReference"
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": {
+                            "value": "sparkpoolnew",
+                            "type": "Expression"
+                        },
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": true,
+                        "spark.dynamicAllocation.minExecutors": 1,
+                        "spark.dynamicAllocation.maxExecutors": 2
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": 1
+                },
+                "linkedServiceName": {
+                    "referenceName": "ls_adf_synap_notebook",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "run_synapse_notebook_gold",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "run_synapse_notebook_silver",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": {
+                            "value": "03_model_gold",
+                            "type": "Expression"
+                        },
+                        "type": "NotebookReference"
+                    },
+                    "snapshot": true,
+                    "sparkPool": {
+                        "referenceName": {
+                            "value": "sparkpoolnew",
+                            "type": "Expression"
+                        },
+                        "type": "BigDataPoolReference"
+                    },
+                    "executorSize": "Small",
+                    "conf": {
+                        "spark.dynamicAllocation.enabled": true,
+                        "spark.dynamicAllocation.minExecutors": 1,
+                        "spark.dynamicAllocation.maxExecutors": 2
+                    },
+                    "driverSize": "Small",
+                    "numExecutors": 1
+                },
+                "linkedServiceName": {
+                    "referenceName": "ls_adf_synap_notebook",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "annotations": [],
+        "lastPublishTime": "2025-10-16T16:23:21Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}

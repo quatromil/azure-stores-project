@@ -1,0 +1,143 @@
+{
+    "name": "pl_get_blob_files",
+    "properties": {
+        "activities": [
+            {
+                "name": "ForEach File",
+                "type": "ForEach",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "items": {
+                        "value": "@pipeline().parameters.storesFiles",
+                        "type": "Expression"
+                    },
+                    "activities": [
+                        {
+                            "name": "Set variableFileName",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "policy": {
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "currentFile",
+                                "value": {
+                                    "value": "@item().name",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Copy data1",
+                            "type": "Copy",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set variableFileName",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "0.12:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "source": {
+                                    "type": "DelimitedTextSource",
+                                    "storeSettings": {
+                                        "type": "AzureBlobStorageReadSettings",
+                                        "recursive": true,
+                                        "wildcardFolderPath": {
+                                            "value": "@pipeline().parameters.storeName",
+                                            "type": "Expression"
+                                        },
+                                        "wildcardFileName": {
+                                            "value": "@item().name",
+                                            "type": "Expression"
+                                        },
+                                        "enablePartitionDiscovery": false
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextReadSettings"
+                                    }
+                                },
+                                "sink": {
+                                    "type": "DelimitedTextSink",
+                                    "storeSettings": {
+                                        "type": "AzureBlobFSWriteSettings"
+                                    },
+                                    "formatSettings": {
+                                        "type": "DelimitedTextWriteSettings",
+                                        "quoteAllText": true,
+                                        "fileExtension": ".txt"
+                                    }
+                                },
+                                "enableStaging": false,
+                                "translator": {
+                                    "type": "TabularTranslator",
+                                    "typeConversion": true,
+                                    "typeConversionSettings": {
+                                        "allowDataTruncation": true,
+                                        "treatBooleanAsNumber": false
+                                    }
+                                }
+                            },
+                            "inputs": [
+                                {
+                                    "referenceName": "dataset_blob_path_moveTo_landing",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "folderName": {
+                                            "value": "pipeline().parameters.storeName",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ],
+                            "outputs": [
+                                {
+                                    "referenceName": "dataset_landing_gen2",
+                                    "type": "DatasetReference",
+                                    "parameters": {
+                                        "folderName": {
+                                            "value": "@pipeline().parameters.storeName",
+                                            "type": "Expression"
+                                        },
+                                        "fileName": {
+                                            "value": "@concat(split(item().name, '_')[0], '.csv')",
+                                            "type": "Expression"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "storesFiles": {
+                "type": "array"
+            },
+            "storeName": {
+                "type": "string"
+            }
+        },
+        "variables": {
+            "currentFile": {
+                "type": "String"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2025-09-28T20:12:09Z"
+    },
+    "type": "Microsoft.DataFactory/factories/pipelines"
+}
